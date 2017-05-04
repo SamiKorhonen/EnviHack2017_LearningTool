@@ -57,7 +57,7 @@
             <div class="panel-body">
                 <h2>Lisää kartalle havainnointipisteitä ja vinkkejä</h2>
                 <p class="info">Voit lisätä kartalle haluamasi määrän pisteitä mielenkiintoisiin paikkoihin lähiympäristöösi. Jokaiselle pisteelle voit lisätä havainnointia tukevia avainsanoja, kysymyksiä jne.</p>
-                <form class="form-horizontal drawForm" onsubmit="return false;">
+                <form id="drawForm" class="form-horizontal drawForm" onsubmit="return false;">
                     <div class="form-group">
                         <div class="col-sm-8">
                             <button id="startDrawing" class="btn btn-success">Piirrä piste kartalle</button>
@@ -72,7 +72,7 @@
                     </div>
                     <button id="report" class="btn btn-success">Tallenna piste ja viesti</button>
                 </form>
-                <form class="form-horizontal saveForm hidden" onsubmit="return false;">
+                <form id="saveForm" class="form-horizontal saveForm hidden" onsubmit="return false;">
                     <div id="confirmText">
                             <div>Karttanäkymä tallennettu onnistuneesti</div>
                     </div>
@@ -107,7 +107,9 @@
         IFRAME_DOMAIN
     );
 
-    var markerMode = false;
+        var markerMode = false;
+        var markerData;
+        var id = 1;
 
     channel.onReady(function() {
         // get layers once we have the connection
@@ -120,9 +122,10 @@
 
     channel.handleEvent('MapClickedEvent', function (data) {
         var x,
-            y,
-            markerData;
-
+            y;
+        if (!id) {
+            var id = 1;
+        }
         if (markerMode) {
             x = data.lon;
             y = data.lat;
@@ -134,7 +137,10 @@
                 msg : '',
                 shape: 3, // icon number (0-6)
                 size: 8,
+                id: id++
             }
+
+            channel.postRequest('MapModulePlugin.AddMarkerRequest', [markerData]);
         }
     });
 
@@ -160,24 +166,34 @@
         clearDrawings();
     });
 
-    elements.reportBtn.click(function() {
-        var message = $('#textArea')[0].value;
-        elements.drawForm.addClass("hidden");
-        elements.saveForm.removeClass("hidden");
-        markerData.msg = message;
-        console.log(markerData);
-        //AJAX POST
-    });
+        elements.reportBtn.click(function () {
+            var message = $('#textArea')[0].value;
+            elements.drawForm.addClass("hidden");
+            elements.saveForm.removeClass("hidden");
+            markerData.msg = message;
+            console.log(markerData);
+
+            $.ajax({
+                url: 'api/marker',
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    alert("Tallennettu: " + data.msg);
+                },
+                data: markerData
+            });
+        });
 
     elements.newPoint.click(function () {
-        clearDrawings();
+        //clearDrawings();
+        $('#textArea')[0].value = "";
         elements.drawForm.removeClass("hidden");
-        elements.newPoint.addClass("hidden");
+        elements.saveForm.addClass("hidden");
     });
 
     function clearDrawings() {
-        var clearData = ['drawing', true];
-        channel.postRequest('DrawTools.StopDrawingRequest', clearData);
+        channel.postRequest('MapModulePlugin.RemoveMarkersRequest', []);
     };
 
     </script>
