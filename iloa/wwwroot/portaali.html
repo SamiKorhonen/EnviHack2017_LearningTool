@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css" />
 
 
-    <!-- Custom styles for this template
-    <link href="style/style.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
 
     <!-- jQUery and javascripts enabling RPC functionality -->
     <!--<script src="lib/jquery-1.11.2.min.js"></script>
@@ -146,6 +146,14 @@
             }
         );
     });
+
+        channel.handleEvent('DrawingEvent', function (data) {
+            var geojson;
+            if (data.isFinished) {
+                geojson = data.geojson;
+                console.log(geojson);
+            }
+        });
 
     elements.drawBtn.click(function () {
         clearDrawings();
