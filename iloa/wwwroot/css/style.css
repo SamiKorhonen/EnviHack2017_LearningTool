@@ -1,6 +1,6 @@
 body {
   padding-top: 20px;
-  background-color: #e5eaf5;
+  background-color: #c6dba4;
 }
 
 #debuglog .logmsg {
@@ -9,8 +9,15 @@ body {
   border: 1px dotted #eee;
   padding: 5px;
 }
-.container {
-  background-color: #ffffff;
+
+.jumbotron {
+  background-color: #edf9d9;
+}
+
+.info {
+  font-style: italic;
+  color: #8d9670;
+  font-size: 18px;
 }
 
 .footer {
