@@ -122,6 +122,11 @@
         var x,
             y,
             markerData;
+
+        if (!id) {
+            var id = 1;
+        }
+
         if (markerMode) {
             x = data.lon;
             y = data.lat;
@@ -132,7 +137,8 @@
                 color: "f9f913",
                 msg : '',
                 shape: 3, // icon number (0-6)
-                size: 8
+                size: 8,
+                id: id++
             }
         }
     });
