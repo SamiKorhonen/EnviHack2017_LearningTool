@@ -123,10 +123,6 @@
             y,
             markerData;
 
-        if (!id) {
-            var id = 1;
-        }
-
         if (markerMode) {
             x = data.lon;
             y = data.lat;
@@ -138,7 +134,6 @@
                 msg : '',
                 shape: 3, // icon number (0-6)
                 size: 8,
-                id: id++
             }
         }
     });
