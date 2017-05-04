@@ -96,8 +96,9 @@
         clearBtn: $("#clearDrawing"),
         reportBtn: $('#report'),
         reportForm: $('#reportForm'),
-        confirmText: $('#confirmText'),
-        fillForm: $('#fillForm')
+        saveForm: $('#saveForm'),
+        drawForm: $('#drawForm'),
+        newPoint: $('#newPoint')
     };
 
     // init connection
@@ -105,6 +106,8 @@
         elements.iframe,
         IFRAME_DOMAIN
     );
+
+    var markerMode = false;
 
     channel.onReady(function() {
         // get layers once we have the connection
@@ -115,16 +118,28 @@
         );
     });
 
-        channel.handleEvent('DrawingEvent', function (data) {
-            var geojson;
-            if (data.isFinished) {
-                geojson = data.geojson;
-                console.log(geojson);
+    channel.handleEvent('MapClickedEvent', function (data) {
+        var x,
+            y,
+            markerData;
+        if (markerMode) {
+            x = data.lon;
+            y = data.lat;
+
+            markerData = {
+                x: x,
+                y: y,
+                color: "f9f913",
+                msg : '',
+                shape: 3, // icon number (0-6)
+                size: 8
             }
-        });
+        }
+    });
 
     elements.drawBtn.click(function () {
-        clearDrawings();
+        markerMode = true;
+        /*
         var drawMode = $("input:radio:checked")[0].value;
         var data = [
             'drawing',
@@ -135,23 +150,28 @@
             }
         ];
         channel.postRequest('DrawTools.StartDrawingRequest', data);
+        */
     });
+
+
 
     elements.clearBtn.click(function () {
         clearDrawings();
     });
 
     elements.reportBtn.click(function() {
-        elements.confirmText.removeClass("hidden");
-        elements.fillForm.removeClass("hidden");
-        
+        var message = $('#textArea')[0].value;
+        elements.drawForm.addClass("hidden");
+        elements.saveForm.removeClass("hidden");
+        markerData.msg = message;
+        console.log(markerData);
+        //AJAX POST
     });
 
-    elements.fillForm.click(function () {
-        elements.reportForm.removeClass("hidden");
-        elements.reportBtn.removeClass("hidden");
-        elements.confirmText.addClass("hidden");
-        elements.fillForm.addClass("hidden");
+    elements.newPoint.click(function () {
+        clearDrawings();
+        elements.drawForm.removeClass("hidden");
+        elements.newPoint.addClass("hidden");
     });
 
     function clearDrawings() {
