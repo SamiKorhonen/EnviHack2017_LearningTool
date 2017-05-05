@@ -31,21 +31,40 @@
       <div class="container">
         <h1>ILOA - ILmiöpohjaisen Oppimisen Apuväline</h1>
         <p>Tervetuloa käyttämään ILOAa - Itseoppimista tukevaa ja inspiroivaa työkalua eri ilmiöiden havainnointiin!</p>
-        <form class="navbar-form navbar-left">
-            <div class="form-group">
-              <input type="text" placeholder="Käyttäjätunnus" class="form-control">
+        
+        <div class="row">
+            <label for="student" class="jumboLabel"> Oppilas: Syötä kenttään opettajan antama karttatunniste.</label>
+            <div id="student" class="form-group">
+                <form class="navbar-form navbar-left">
+                    <div class="form-group">
+                        <input id="mapId" type="text" placeholder="Kartan tunniste" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <button id="studentLogin" type="submit" class="btn btn-success">Kirjaudu sisään</button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-              <input type="password" placeholder="Salasana" class="form-control">
+        </div>
+        <div class="row">
+            <label for="registration" class="jumboLabel"> Opettaja: Kirjaudu sisään tunnuksillasi</label>
+            <div id="registration" class="form-group">
+                <form class="navbar-form navbar-left">
+                    <div class="form-group">
+                      <input type="text" placeholder="Käyttäjätunnus" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <input type="password" placeholder="Salasana" class="form-control">
+                    </div>
+                    <button id="teacherLogin" type="submit" class="btn btn-success">Kirjaudu sisään</button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-success">Kirjaudu sisään</button>
-        </form>
+        </div>
       </div>
     </div>
     <div class="container">
       <div class="row">
         <div class="col-sm-7 col-md-7 col-lg-6">
-          <div class="panel panel-default map-panel">
+          <div class="panel panel-default map-panel hidden">
             <div class="panel-body">
                 <iframe src="http://www.paikkatietoikkuna.fi/published/fi/51d3b165-29fc-41b2-9601-365d8d086ec5"
                         id="publishedMap" style="border: none; width: 100%; height: 100%;"></iframe>
@@ -53,7 +72,7 @@
           </div>
         </div>
         <div class="col-sm-5 col-md-5 col-lg-6">
-          <div class="panel panel-default form-panel">
+          <div class="panel panel-default form-panel hidden">
             <div class="panel-body">
                 <h2>Lisää kartalle havainnointipisteitä ja vinkkejä</h2>
                 <p class="info">Voit lisätä kartalle haluamasi määrän pisteitä mielenkiintoisiin paikkoihin lähiympäristöösi. Jokaiselle pisteelle voit lisätä havainnointia tukevia avainsanoja, kysymyksiä jne.</p>
@@ -66,8 +85,10 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-8">
-                            <label for="textArea">Viesti</label>
-                            <textarea id="textArea" name="desc" class="form-control" rows="6"></textarea>
+                            <label class="formLabel" for="textArea">Viesti</label>
+                            <textarea id="textArea" name="desc" class="form-control" rows="6" placeholder="Kirjoita tähän havainnointia tukevia avainsanoja, kysymyksiä jne."></textarea>
+                            <label class="formLabel" for="idForMap">Kartan nimi</label>
+                            <input type="text" id="idForMap" class="form-control"></input>
                         </div>
                     </div>
                     <button id="report" class="btn btn-success">Tallenna piste ja viesti</button>
@@ -98,7 +119,9 @@
         reportForm: $('#reportForm'),
         saveForm: $('#saveForm'),
         drawForm: $('#drawForm'),
-        newPoint: $('#newPoint')
+        newPoint: $('#newPoint'),
+        studentBtn: $('#studentLogin'),
+        teacherBtn: $('#teacherLogin')
     };
 
     // init connection
@@ -107,9 +130,49 @@
         IFRAME_DOMAIN
     );
 
-        var markerMode = false;
-        var markerData;
-        var id = 1;
+    var markerMode = false;
+    var markerData;
+    var id = 1;
+
+    //NEXT IS FAKE DATA SINCE WE CAN*T GET THE REAL MARKER DATA YET FROM THE DATABASE -->
+        var marker1 = {
+            x: 382907.5254929903,
+            y: 6675785.080995327,
+            color: "f9f913",
+            msg : '',
+            shape: 3, // icon number (0-6)
+            size: 8
+        };
+
+        var marker2 = {
+            x: 383163.5254929903,
+            y: 6676153.080995327,
+            color: "f9f913",
+            msg : '',
+            shape: 3, // icon number (0-6)
+            size: 8
+        };
+
+        var marker3 = {
+            x: 383161.5254929903,
+            y: 6676011.080995327,
+            color: "f9f913",
+            msg : '',
+            shape: 3, // icon number (0-6)
+            size: 8
+        };
+
+        var marker4 = {
+            x: 383089.5254929903,
+            y: 6675799.080995327,
+            color: "f9f913",
+            msg : '',
+            shape: 3, // icon number (0-6)
+            size: 8
+        };
+
+
+    var marker2 = 
 
     channel.onReady(function() {
         // get layers once we have the connection
@@ -137,7 +200,7 @@
                 msg : '',
                 shape: 3, // icon number (0-6)
                 size: 8,
-                id: id++
+                id: id++,
             }
 
             channel.postRequest('MapModulePlugin.AddMarkerRequest', [markerData]);
@@ -168,9 +231,11 @@
 
         elements.reportBtn.click(function () {
             var message = $('#textArea')[0].value;
+            var pointID = $('#idForMap')[0].value;
             elements.drawForm.addClass("hidden");
             elements.saveForm.removeClass("hidden");
             markerData.msg = message;
+            markerData["tag"] = pointID;
             console.log(markerData);
 
             $.ajax({
@@ -190,6 +255,24 @@
         $('#textArea')[0].value = "";
         elements.drawForm.removeClass("hidden");
         elements.saveForm.addClass("hidden");
+    });
+
+    elements.studentBtn.click(function (data) {
+        $('.map-panel').removeClass('hidden');
+        
+        var mapId = $('#mapId')[0].value;
+        // TODO: Get the points from the db that match the given mapId
+
+        //Let's post fake markers to demo the functionality
+        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker1]);
+        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker2]);
+        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker3]);
+        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker4]);
+    });
+
+    elements.teacherBtn.click(function (data) {
+        $('.map-panel').removeClass('hidden');
+        $('.form-panel').removeClass('hidden');
     });
 
     function clearDrawings() {

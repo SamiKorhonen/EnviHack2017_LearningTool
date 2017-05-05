@@ -14,10 +14,23 @@ body {
   background-color: #edf9d9;
 }
 
+.jumboLabel {
+  font-size: 24px;
+}
+
+.form-control.short {
+  width: 50%;
+}
+
 .info {
   font-style: italic;
   color: #8d9670;
   font-size: 18px;
+}
+
+.formLabel {
+  font-size: 18px;
+  margin-top: 10px;
 }
 
 .footer {
