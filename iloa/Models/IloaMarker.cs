@@ -27,6 +27,8 @@ namespace iloa.Models
         public double Shape { get; set; }
         [JsonProperty("size")]
         public double Size { get; set; }
+        [JsonProperty("tag")]
+        public string Tag { get; set; }
 
     }
 }

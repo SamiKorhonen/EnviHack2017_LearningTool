@@ -7,10 +7,10 @@ namespace iloa
 {
     public class AppSettings
     {
-        public string Database { get; set; }
-        public string Collection { get; set; }
+        public string database { get; set; }
+        public string collection { get; set; }
 
-        public string EndPoint { get; set; }
-        public string AuthKey { get; set; }
+        public string endpoint { get; set; }
+        public string authkey { get; set; }
     }
 }

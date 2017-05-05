@@ -40,7 +40,7 @@
                         <input id="mapId" type="text" placeholder="Kartan tunniste" class="form-control">
                     </div>
                     <div class="form-group">
-                        <button id="studentLogin" type="submit" class="btn btn-success">Kirjaudu sisään</button>
+                        <button id="studentLogin" type="button" class="btn btn-success">Kirjaudu sisään</button>
                     </div>
                 </form>
             </div>
@@ -55,7 +55,7 @@
                     <div class="form-group">
                       <input type="password" placeholder="Salasana" class="form-control">
                     </div>
-                    <button id="teacherLogin" type="submit" class="btn btn-success">Kirjaudu sisään</button>
+                    <button id="teacherLogin" type="button" class="btn btn-success">Kirjaudu sisään</button>
                 </form>
             </div>
         </div>
@@ -172,7 +172,7 @@
         };
 
 
-    var marker2 = 
+    //var marker2 = 
 
     channel.onReady(function() {
         // get layers once we have the connection
@@ -246,7 +246,7 @@
                 success: function (data) {
                     alert("Tallennettu: " + data.msg);
                 },
-                data: markerData
+                data: JSON.stringify(markerData)
             });
         });
 
@@ -262,12 +262,17 @@
         
         var mapId = $('#mapId')[0].value;
         // TODO: Get the points from the db that match the given mapId
-
+        $.getJSON("api/marker/" + mapId, function (data) {
+            
+            $.each(data, function (index, value) {
+                channel.postRequest('MapModulePlugin.AddMarkerRequest', [value]);
+            });
+        });
         //Let's post fake markers to demo the functionality
-        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker1]);
-        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker2]);
-        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker3]);
-        channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker4]);
+        //channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker1]);
+        //channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker2]);
+        //channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker3]);
+        //channel.postRequest('MapModulePlugin.AddMarkerRequest', [marker4]);
     });
 
     elements.teacherBtn.click(function (data) {

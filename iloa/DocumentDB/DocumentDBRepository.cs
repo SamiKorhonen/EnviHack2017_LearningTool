@@ -7,20 +7,31 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using System.Diagnostics;
 
 namespace iloa.DocumentDB
 {
-    public static class DocumentDBRepository<T> where T : class
+    public class DocumentDBRepository<T> where T : class
     {
         //private static readonly string DatabaseId = Configuration ConfigurationManager.AppSettings["database"];
         //private static readonly string CollectionId = ConfigurationManager.AppSettings["collection"];
-        public static string DatabaseId = "";
-        public static string CollectionId = "";
-        public static string AuthKey = "";
-        public static string EndPoint = "";
+        private string DatabaseId = "";
+        private string CollectionId = "";
+        private string AuthKey = "";
+        private string EndPoint = "";
         private static DocumentClient client;
 
-        public static async Task<T> GetItemAsync(string id)
+        public DocumentDBRepository(string database, string collection, string authKey, string endPoint)
+        {
+            DatabaseId = database;
+            CollectionId = collection;
+            AuthKey = authKey;
+            EndPoint = endPoint;
+
+            this.Initialize();
+        }
+
+        public async Task<T> GetItemAsync(string id)
         {
             try
             {
@@ -40,8 +51,11 @@ namespace iloa.DocumentDB
             }
         }
 
-        public static async Task<IEnumerable<T>> GetItemsAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> GetItemsAsync(Expression<Func<T, bool>> predicate)
         {
+            Trace.TraceInformation("Starting GetItemsAsync.");
+            Trace.TraceInformation("Database: " + DatabaseId);
+            Trace.TraceInformation("Collection: " + CollectionId);
             IDocumentQuery<T> query = client.CreateDocumentQuery<T>(
                 UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
                 new FeedOptions { MaxItemCount = -1 })
@@ -57,22 +71,22 @@ namespace iloa.DocumentDB
             return results;
         }
 
-        public static async Task<Document> CreateItemAsync(T item)
+        public async Task<Document> CreateItemAsync(T item)
         {
             return await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), item);
         }
 
-        public static async Task<Document> UpdateItemAsync(string id, T item)
+        public async Task<Document> UpdateItemAsync(string id, T item)
         {
             return await client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id), item);
         }
 
-        public static async Task DeleteItemAsync(string id)
+        public async Task DeleteItemAsync(string id)
         {
             await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
         }
 
-        public static void Initialize()
+        private void Initialize()
         {
             //client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["endpoint"]), ConfigurationManager.AppSettings["authKey"]);
             client = new DocumentClient(new Uri(EndPoint), AuthKey);
@@ -80,7 +94,7 @@ namespace iloa.DocumentDB
             CreateCollectionIfNotExistsAsync().Wait();
         }
 
-        private static async Task CreateDatabaseIfNotExistsAsync()
+        private async Task CreateDatabaseIfNotExistsAsync()
         {
             try
             {
@@ -99,7 +113,7 @@ namespace iloa.DocumentDB
             }
         }
 
-        private static async Task CreateCollectionIfNotExistsAsync()
+        private async Task CreateCollectionIfNotExistsAsync()
         {
             try
             {
