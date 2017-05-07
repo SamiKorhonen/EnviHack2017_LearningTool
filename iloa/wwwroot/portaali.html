@@ -47,6 +47,7 @@
         </div>
         <div class="row">
             <label for="registration" class="jumboLabel"> Opettaja: Kirjaudu sisään tunnuksillasi</label>
+            <p> (Kirjautuminen ei toimi oikeasti, joten mitkä tahansa tunnukset käyvät) </p>
             <div id="registration" class="form-group">
                 <form class="navbar-form navbar-left">
                     <div class="form-group">
@@ -88,7 +89,7 @@
                             <label class="formLabel" for="textArea">Viesti</label>
                             <textarea id="textArea" name="desc" class="form-control" rows="6" placeholder="Kirjoita tähän havainnointia tukevia avainsanoja, kysymyksiä jne."></textarea>
                             <label class="formLabel" for="idForMap">Kartan nimi</label>
-                            <input type="text" id="idForMap" class="form-control"></input>
+                            <input type="text" id="idForMap" placeholder="Oppilas näkee kartan tällä tunnuksella" class="form-control"></input>
                         </div>
                     </div>
                     <button id="report" class="btn btn-success">Tallenna piste ja viesti</button>
@@ -204,6 +205,7 @@
             }
 
             channel.postRequest('MapModulePlugin.AddMarkerRequest', [markerData]);
+            markerMode = false;
         }
     });
 
@@ -259,6 +261,7 @@
 
     elements.studentBtn.click(function (data) {
         $('.map-panel').removeClass('hidden');
+        $('.form-panel').addClass('hidden');
         
         var mapId = $('#mapId')[0].value;
         // TODO: Get the points from the db that match the given mapId
